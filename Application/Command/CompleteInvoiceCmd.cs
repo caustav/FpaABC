@@ -25,10 +25,10 @@ namespace Application.Command
         public Task<string> Handle(CompleteInvoiceCmd request, CancellationToken cancellationToken)
         {
             var invoice = builder.Build<Invoice>(request.InvoiceNumber, eventStoreHandler);
-            if (invoice.InvoiceStatus != Invoice.Status.INVOICE_APPROVED)
-            {
-                throw new InvoiceIncompleteException();
-            }
+            // if (invoice.InvoiceStatus != Invoice.Status.INVOICE_APPROVED)
+            // {
+            //     throw new InvoiceIncompleteException();
+            // }
             invoice.Complete();
             eventStoreHandler.Publish<DomainEvent>(invoice.EventsGenerated);
             

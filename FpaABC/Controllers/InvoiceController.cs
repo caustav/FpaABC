@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 
 namespace FpaABC.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("[controller]")]
     public class InvoiceController : ControllerBase
     {
         IMediator Mediator { get; }
@@ -19,10 +19,10 @@ namespace FpaABC.Controllers
             this.Mediator = mediator;
         }
 
-        [HttpGet("home"), ]
+        [HttpGet]
         public ContentResult GetHome() => base.Content("<h1>FpaABC is running</h1>", "text/html");
 
-        [HttpGet]
+        [HttpGet("all")]
         public async Task<IEnumerable<InvoiceDTO>> Get()
             => await Mediator.Send(new AllInvoicesQuery());
 

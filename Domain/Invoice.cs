@@ -1,6 +1,7 @@
 ﻿using System;
 using Domain.Common;
 using Domain.DomainEvents;
+using Microsoft.Extensions.Logging;
 
 namespace Domain
 {
@@ -16,48 +17,72 @@ namespace Domain
             INVOICE_COMPLETED
         }
 
-        public string Id { get; set; } = string.Empty;
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public string InvoiceNumber { get; set; } = string.Empty;
+        public string InvoiceAmount { get; set; } = string.Empty;
         public string Date { get; set; } = string.Empty;
         public string CompanyId { get; set; } = string.Empty;
         public string Vendor { get; set; } = string.Empty;
         public Status InvoiceStatus { get; private set; } = Status.INVOICE_UNKNOWN;
 
-        public Invoice()
+        private ILogger<Invoice>? Logger { get; set;}
+
+        public new void AddLogger(ILoggerFactory loggerFactory)
         {
-            Id = Guid.NewGuid().ToString();
-            var @event = new InvoiceCreated();
-            Apply(@event);
+            this.LoggerFactory = loggerFactory;
+            this.Logger = LoggerFactory!.CreateLogger<Invoice>();
+            base.AddLogger(loggerFactory);
+        }
+
+        public void Create(string invoiceNumber, string invoiceAmount)
+        {
+            ArgumentNullException.ThrowIfNull(InvoiceNumber);
+
+            RaiseEvent<InvoiceCreated>((@event)=>
+            {
+                @event.InvoiceNumber = invoiceNumber;
+                @event.InvoiceAmount = InvoiceAmount;
+            });
         }
 
         public void Approve()
         {
-            var @event = new InvoiceApproved();
-            Apply(@event);
+            ArgumentNullException.ThrowIfNull(InvoiceNumber);
+            RaiseEvent<InvoiceApproved>((@event)=>
+            {
+                @event.InvoiceNumber = InvoiceNumber;
+            });
         }
 
         public void Complete()
         {
-            var @event = new InvoiceCompleted();
-            Apply(@event);
+            ArgumentNullException.ThrowIfNull(InvoiceNumber);
+
+            RaiseEvent<InvoiceCompleted>((@event)=>
+            {
+                @event.InvoiceNumber = InvoiceNumber;
+                @event.DueDate = DateTime.Now.ToString("yyyy'-'MM'-'dd'T'HH':'mm':'ss");
+            });
         }
 
         public void Apply(InvoiceCreated invoiceCreated)
         {
             InvoiceStatus = Status.INVOICE_PENDING;
-            Apply<InvoiceCreated>(invoiceCreated);
+            InvoiceAmount = invoiceCreated.InvoiceAmount;
+            InvoiceNumber = invoiceCreated.InvoiceNumber;
         }   
 
         public void Apply(InvoiceApproved invoiceApproved)
         {
             InvoiceStatus = Status.INVOICE_APPROVED;
-            Apply<InvoiceApproved>(invoiceApproved);
+            InvoiceNumber = invoiceApproved.InvoiceNumber;
         }
         
         public void Apply(InvoiceCompleted invoiceCompleted)
         {
             InvoiceStatus = Status.INVOICE_COMPLETED;
-            Apply<InvoiceCompleted>(invoiceCompleted);
+            InvoiceNumber = invoiceCompleted.InvoiceNumber;
+            Date = invoiceCompleted.DueDate;
         }
     }
 }
