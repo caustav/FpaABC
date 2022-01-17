@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Domain.Common
 {
-    public abstract class Aggregate : ICanApply<string>
+    public abstract class Aggregate : IRebuildFrom
     {
         private ILogger<Aggregate>? Logger { get; set;}
         
@@ -18,26 +18,19 @@ namespace Domain.Common
 
         private List<DomainEvent> DomainEvents {get;} = new List<DomainEvent>();
 
-        protected void RaiseEvent<T>(Action<T> raiseCallback) where T : DomainEvent, new()
+        protected void RaiseEvent<T>(Action<T> cbEventRaised) where T : DomainEvent, new()
         {   
             T t = new T();     
-            raiseCallback(t);
-            Apply(t);
+            cbEventRaised(t);
+            ((dynamic)this).Apply(t);
             DomainEvents.Add(t);
         }
 
-        private void Apply(DomainEvent @event)
+        public void RebuildFrom(string strDomainEvent)
         {
-            /// DO NOTHING
-        }
-
-        public void Apply(string strDomainEvent)
-        {
-            Logger?.LogInformation(strDomainEvent);
-
             var objActualEvent = EventParser.Parse(strDomainEvent);
                         
-            Apply(objActualEvent);
+            ((dynamic)this).Apply(objActualEvent);
         }
 
         public IEnumerable<DomainEvent> EventsGenerated

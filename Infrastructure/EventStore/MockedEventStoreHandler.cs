@@ -43,7 +43,7 @@ namespace Infrastructure.EventStore
             return  Task.CompletedTask;
         }
         
-        public IEnumerable<string> GetEvents(string aggregateId)
+        public Task<IEnumerable<string>> GetEvents(string aggregateId)
         {
             var e1 = new InvoiceCreated
             {
@@ -58,11 +58,13 @@ namespace Infrastructure.EventStore
                 InvoiceNumber = "I-980"
             };
 
-            return new List<string>()
+            IEnumerable<string> eventList = new List<string>()
             {
                 JsonConvert.SerializeObject(e1).ToString(),
                 JsonConvert.SerializeObject(e2).ToString()
             };
+
+            return Task.FromResult(eventList);
         }
     }
 }

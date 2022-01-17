@@ -7,3 +7,4 @@ Application/obj
 Domain/bin
 Domain/obj
 publish/
+.vscode/

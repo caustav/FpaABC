@@ -22,14 +22,14 @@ namespace Application.Common
             return srcObject.Adapt<TDst>();
         }
 
-        public T Build<T>(string id, IEventStoreHandler eventStoreHandler) where T : ICanApply<string>, new()
+        public async Task<T> Build<T>(string id, IEventStoreHandler eventStoreHandler) where T : IRebuildFrom, new()
         {
-            var eventsPublished = eventStoreHandler.GetEvents(id);
+            var eventsPublished = await eventStoreHandler.GetEvents(id);
             var obj = new T();
             ((dynamic)obj).AddLogger(LoggerFactory);
             foreach (var @event in eventsPublished)
             {
-                obj.Apply(@event);
+                obj.RebuildFrom(@event);
             }
             return obj;
         }

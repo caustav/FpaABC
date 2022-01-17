@@ -5,6 +5,7 @@ namespace Application.Common
     public interface IEventStoreHandler
     {
         Task Publish<TEvent>(IEnumerable<TEvent> @domainEvents);
-        IEnumerable<string> GetEvents(string aggregateId);
+        
+        Task<IEnumerable<string>> GetEvents(string aggregateId);
     }
 }

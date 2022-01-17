@@ -22,17 +22,18 @@ namespace Application.Command
             this.eventStoreHandler = eventStoreHandler;
         }
 
-        public Task<string> Handle(CompleteInvoiceCmd request, CancellationToken cancellationToken)
+        public async Task<string> Handle(CompleteInvoiceCmd request, CancellationToken cancellationToken)
         {
-            var invoice = builder.Build<Invoice>(request.InvoiceNumber, eventStoreHandler);
+            var invoice = await builder.Build<Invoice>(request.InvoiceNumber, eventStoreHandler);
             // if (invoice.InvoiceStatus != Invoice.Status.INVOICE_APPROVED)
             // {
             //     throw new InvoiceIncompleteException();
             // }
+
             invoice.Complete();
-            eventStoreHandler.Publish<DomainEvent>(invoice.EventsGenerated);
+            await eventStoreHandler.Publish<DomainEvent>(invoice.EventsGenerated);
             
-            return Task.FromResult(invoice.Id);
+            return invoice.Id;
         }
     }
 }
