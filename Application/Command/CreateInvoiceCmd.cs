@@ -24,12 +24,12 @@ namespace Application.Command
             this.eventStoreHandler = eventStoreHandler;
         }
 
-        public Task<string> Handle(CreateInvoiceCmd request, CancellationToken cancellationToken)
+        public async Task<string> Handle(CreateInvoiceCmd request, CancellationToken cancellationToken)
         {
             var invoice = builder.Build<CreateInvoiceCmd, Invoice>(request);
             invoice.Create(invoice.InvoiceNumber, invoice.InvoiceAmount);
-            eventStoreHandler.Publish<DomainEvent>(invoice.EventsGenerated);
-            return Task.FromResult(invoice.Id);
+            await eventStoreHandler.Publish<DomainEvent>(invoice.EventsGenerated, invoice.InvoiceNumber);
+            return invoice.Id;
         }
     }
 }

@@ -33,7 +33,7 @@ namespace Infrastructure.EventStore
             this.Logger = logger;
         }
 
-        public Task Publish<TEvent>(IEnumerable<TEvent> @domainEvents)
+        public Task Publish<TEvent>(IEnumerable<TEvent> @domainEvents, string streamId)
         {
             foreach (var item in domainEvents)
             {
@@ -43,7 +43,7 @@ namespace Infrastructure.EventStore
             return  Task.CompletedTask;
         }
         
-        public Task<IEnumerable<string>> GetEvents(string aggregateId)
+        public Task<IEnumerable<string>> GetEvents(string streamId)
         {
             var e1 = new InvoiceCreated
             {

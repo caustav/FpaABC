@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using Application.Projections;
 
 namespace Application
 {
@@ -15,6 +16,7 @@ namespace Application
             // services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             // services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ConfigurationBehavior<,>));
             services.AddTransient<ObjectBuilder>();
+            services.AddSingleton<IProjection, Projection>();
             // services.AddScoped<ApplicationMiddleware>();
         }
 

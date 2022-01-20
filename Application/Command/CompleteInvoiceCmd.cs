@@ -25,13 +25,13 @@ namespace Application.Command
         public async Task<string> Handle(CompleteInvoiceCmd request, CancellationToken cancellationToken)
         {
             var invoice = await builder.Build<Invoice>(request.InvoiceNumber, eventStoreHandler);
-            // if (invoice.InvoiceStatus != Invoice.Status.INVOICE_APPROVED)
-            // {
-            //     throw new InvoiceIncompleteException();
-            // }
+            if (invoice.InvoiceStatus != Invoice.Status.INVOICE_APPROVED)
+            {
+                throw new InvoiceIncompleteException();
+            }
 
             invoice.Complete();
-            await eventStoreHandler.Publish<DomainEvent>(invoice.EventsGenerated);
+            await eventStoreHandler.Publish<DomainEvent>(invoice.EventsGenerated, request.InvoiceNumber);
             
             return invoice.Id;
         }

@@ -11,10 +11,19 @@ namespace Infrastructure
     {
         public static void AddInfrastructure(this IServiceCollection services)
         {
-            services.AddScoped<IRepository<InvoiceDTO>, MongoRepositoryInvoice>();
-            services.AddScoped<IEventStoreHandler, MockedEventStoreHandler>();
+            services.AddScoped<IRepository<InvoiceDTO>, ConsoleRepository>();
+            services.AddScoped<IEventStoreHandler, EventStoreHandler>();
+            services.AddSingleton<IEventStoreSubscription, EventStoreSubscription>();
             services.AddSingleton<IConfiguration, Configuration>();
             services.AddSingleton<MongoAdapter>();
+
+            services.BuildServiceProvider().GetRequiredService<IEventStoreSubscription>().Enable().ContinueWith((task)=>
+            {
+                if (task.Status == TaskStatus.Faulted)
+                {
+                    throw new Exception(task.Exception!.InnerException!.Message ?? "Error in enabling subscription");
+                }
+            });
         }
     }
 }

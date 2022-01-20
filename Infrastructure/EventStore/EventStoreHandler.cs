@@ -1,7 +1,5 @@
 using Application.Common;
-using Newtonsoft.Json;
 using Microsoft.Extensions.Logging;
-using System.Linq;
 using EventStore.Client;
 using System.Text;
 
@@ -17,41 +15,51 @@ namespace Infrastructure.EventStore
         {
             this.Logger = logger;
 
-            var settings = EventStoreClientSettings.Create("esdb://localhost:2113?tls=false");
+            var settings = EventStoreClientSettings.Create("esdb://localhost:2111,localhost:2112,localhost:2113?tls=true&tlsVerifyCert=false");
             eventStoreClient = new EventStoreClient(settings);
         }
 
-        public async Task Publish<TEvent>(IEnumerable<TEvent> @domainEvents)
+        public async Task Publish<TEvent>(IEnumerable<TEvent> @events, string streamId)
         {
-            var eventsToBePublished = @domainEvents.Select(@event => new EventData(Uuid.NewUuid(), "fpa-event",
-                            Encoding.UTF8.GetBytes(@event!.ToString()!)));
-
-
-            await eventStoreClient.AppendToStreamAsync("fpa-stream", StreamState.Any, eventsToBePublished);  
+            try
+            {
+                var eventsToBePublished = @events.Select(@event => 
+                    {
+                        Logger.LogInformation($"Event being published : {@event!.ToString()!}");
+                        return new EventData(Uuid.NewUuid(), $"fpa-event", Encoding.UTF8.GetBytes(@event!.ToString()!));
+                    });
+                    
+                await eventStoreClient.AppendToStreamAsync($"fpa-stream-{streamId}", StreamState.Any, eventsToBePublished);                 
+            }
+            catch(Exception e)
+            {
+                throw new Exception("Error in publishing events", e);
+            } 
         }
         
-        public Task<IEnumerable<string>> GetEvents(string aggregateId)
+        public async Task<IEnumerable<string>> GetEvents(string aggregateId)
         {
-            var e1 = new InvoiceCreated
-            {
-                Name = nameof(InvoiceCreated),
-                InvoiceNumber = "I-980",
-                InvoiceAmount = "2500 INR"
-            };
+            var events = await ReadAllEventsFromAggregateStreamInstance(aggregateId);
+            return events;
+        }
 
-            var e2 = new InvoiceApproved
+        private async Task<IEnumerable<string>> ReadAllEventsFromAggregateStreamInstance(string streamId)
+        {
+            List<string> eventList = new List<string>();
+            try
             {
-                Name = nameof(InvoiceApproved),
-                InvoiceNumber = "I-980"
-            };
-
-            IEnumerable<string> eventList = new List<string>()
+                var streamResults = eventStoreClient.ReadStreamAsync(Direction.Forwards, $"fpa-stream-{streamId}", StreamPosition.Start);
+                await foreach (var streamResult in streamResults)
+                {
+                        eventList.Add(Encoding.UTF8.GetString(streamResult.Event.Data.ToArray()));
+                }                
+            }
+            catch (Exception e)
             {
-                JsonConvert.SerializeObject(e1).ToString(),
-                JsonConvert.SerializeObject(e2).ToString()
-            };
+                throw new Exception("Error in reading events from event store", e);
+            }
 
-            return Task.FromResult(eventList);
+            return eventList;
         }
     }
 }

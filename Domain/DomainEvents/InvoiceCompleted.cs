@@ -1,9 +1,10 @@
 using Domain.Common;
 using Newtonsoft.Json;
+using MediatR;
 
 namespace Domain.DomainEvents
 {
-    public class InvoiceCompleted : DomainEvent, IConvertFrom<InvoiceCompleted>
+    public class InvoiceCompleted : DomainEvent, IConvertFrom<InvoiceCompleted>, INotification
     {
         public string InvoiceNumber {get; set;} = string.Empty;
         public string DueDate {get; set;} = string.Empty;

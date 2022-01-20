@@ -26,7 +26,7 @@ namespace Application.Command
         {
             var invoice = await builder.Build<Invoice>(request.InvoiceNumber, eventStoreHandler);
             invoice.Approve();
-            await eventStoreHandler.Publish<DomainEvent>(invoice.EventsGenerated);
+            await eventStoreHandler.Publish<DomainEvent>(invoice.EventsGenerated, request.InvoiceNumber);
             return invoice.Id;
         }
     }
