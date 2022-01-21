@@ -1,18 +1,18 @@
 using MediatR;
 using Domain.Common;
 
-namespace Application.Projections
+namespace Application.EventSubscriber
 {
-    internal class Projection : IProjection
+    internal class Subscriber : ISubscriber
     {
         IMediator? Mediator { get; }
 
-        public Projection(IMediator mediator)
+        public Subscriber(IMediator mediator)
         {
             this.Mediator = mediator;
         }
 
-        public async Task Handle(string @eventStr)
+        public async Task OnUpdate(string @eventStr)
         {
             var objActualEvent = EventParser.Parse(eventStr);
             await Mediator!.Publish(objActualEvent);

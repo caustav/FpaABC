@@ -22,26 +22,26 @@ namespace Infrastructure.Repositories
 
         public InvoiceDTO Get(InvoiceDTO invoice)
         {
-            return new InvoiceDTO { InvoiceNumber = "I#1234",   CompanyId = "1234", Vendor = "V-123"};
+            return new InvoiceDTO { InvoiceNumber = "I#1234",   InvoiceAmount = "1234"};
         }
 
         public InvoiceDTO Get(string id)
         {
-            return new InvoiceDTO { InvoiceNumber = "II#1234", CompanyId = "1234", Vendor = "V-123" };
+            return new InvoiceDTO { InvoiceNumber = "II#1234", InvoiceAmount = "1234"};
         }
 
         public IEnumerable<InvoiceDTO> GetAll()
         {
             return new List<InvoiceDTO>()
             {
-                new InvoiceDTO { InvoiceNumber = "II#1234", CompanyId = "1234", Vendor = "V-123" },
-                new InvoiceDTO { InvoiceNumber = "I#1234", CompanyId = "1234", Vendor = "V-123" }
+                new InvoiceDTO { InvoiceNumber = "II#1234"},
+                new InvoiceDTO { InvoiceNumber = "I#1234"}
             };
         }
 
         public InvoiceDTO Set(InvoiceDTO invoice)
         {
-            return new InvoiceDTO { InvoiceNumber = "IIS#1234", CompanyId = "1234", Vendor = "V-1234" };
+            return new InvoiceDTO { InvoiceNumber = "IIS#1234", InvoiceAmount = "1234"};
         }
     }
 }

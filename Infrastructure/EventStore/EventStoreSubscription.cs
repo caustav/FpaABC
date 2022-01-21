@@ -1,5 +1,5 @@
 using EventStore.Client;
-using Application.Projections;
+using Application.EventSubscriber;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Grpc.Core;
@@ -8,15 +8,15 @@ namespace Infrastructure.EventStore
 {
     public class EventStoreSubscription : IEventStoreSubscription
     {
-        IProjection projection;
+        ISubscriber subscriber;
         ILogger<EventStoreSubscription> logger;
 
         EventStorePersistentSubscriptionsClient? client;
         UserCredentials? userCredentials;
 
-        public EventStoreSubscription(IProjection projection, ILogger<EventStoreSubscription> logger)
+        public EventStoreSubscription(ISubscriber subscriber, ILogger<EventStoreSubscription> logger)
         {
-            this.projection = projection;
+            this.subscriber = subscriber;
             this.logger = logger;
         }
         
@@ -72,7 +72,7 @@ namespace Infrastructure.EventStore
                     "fpa-group",
                     async (subscription, resolvedEvent, bufferSize, cancellationToken) => {
                         string str = Encoding.UTF8.GetString(resolvedEvent.Event.Data.ToArray());
-                        await projection.Handle(Encoding.UTF8.GetString(resolvedEvent.Event.Data.ToArray()));
+                        await subscriber.OnUpdate(Encoding.UTF8.GetString(resolvedEvent.Event.Data.ToArray()));
                     },
                     (subscription, reason, exception) => {
                         logger.LogError(exception!.Message);

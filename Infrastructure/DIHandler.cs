@@ -11,7 +11,7 @@ namespace Infrastructure
     {
         public static void AddInfrastructure(this IServiceCollection services)
         {
-            services.AddScoped<IRepository<InvoiceDTO>, ConsoleRepository>();
+            services.AddScoped<IRepository<InvoiceDTO>, MongoRepositoryInvoice>();
             services.AddScoped<IEventStoreHandler, EventStoreHandler>();
             services.AddSingleton<IEventStoreSubscription, EventStoreSubscription>();
             services.AddSingleton<IConfiguration, Configuration>();

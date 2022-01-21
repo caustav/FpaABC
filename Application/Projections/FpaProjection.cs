@@ -2,6 +2,7 @@ using MediatR;
 using Mapster;
 using Domain.DomainEvents;
 using Application.Common;
+using Domain;
 
 namespace Application.Projections
 {
@@ -19,6 +20,7 @@ namespace Application.Projections
         public Task Handle(InvoiceCreated request, CancellationToken cancellationToken)
         {
             var dtoInvoice = request.Adapt<InvoiceDTO>();
+            dtoInvoice.InvoiceStatus = Invoice.Status.INVOICE_PENDING;
             repository.Add(dtoInvoice);
             return Task.CompletedTask;
         }
@@ -26,6 +28,7 @@ namespace Application.Projections
         public Task Handle(InvoiceApproved request, CancellationToken cancellationToken)
         {
             var dtoInvoice = request.Adapt<InvoiceDTO>();
+            dtoInvoice.InvoiceStatus = Invoice.Status.INVOICE_APPROVED;
             repository.Set(dtoInvoice);
             return Task.CompletedTask;
         }
@@ -33,6 +36,7 @@ namespace Application.Projections
         public Task Handle(InvoiceCompleted request, CancellationToken cancellationToken)
         {
             var dtoInvoice = request.Adapt<InvoiceDTO>();
+            dtoInvoice.InvoiceStatus = Invoice.Status.INVOICE_COMPLETED;
             repository.Set(dtoInvoice);
             return Task.CompletedTask;
         }

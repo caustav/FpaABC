@@ -14,22 +14,21 @@ namespace Infrastructure
 
         public MongoAdapter(IConfiguration configuration)
         {
-            Configuration = configuration;
+            MongoClient = new MongoClient("mongodb://127.0.0.1:27017");
+            MongoDatabase = MongoClient.GetDatabase("FpaABC");
         }
 
-        private void LoadDatabase()
-        {
-            if (MongoDatabase == null)
-            {
-                MongoClient = new MongoClient(Configuration.DatabaseConnectionString);
-                MongoDatabase = MongoClient.GetDatabase(Configuration.DatabaseName);
-            }
-        }
+        // private void LoadDatabase()
+        // {
+        //     if (MongoDatabase == null)
+        //     {
+        //         MongoClient = new MongoClient(Configuration.DatabaseConnectionString);
+        //         MongoDatabase = MongoClient.GetDatabase(Configuration.DatabaseName);
+        //     }
+        // }
 
         public void Insert<TModel>(string collectionName, TModel doc)
         {
-            LoadDatabase();
-
             if (String.IsNullOrEmpty(collectionName) || doc == null)
             {
                 throw new Exception("Invalid input is supplied");
@@ -41,8 +40,6 @@ namespace Infrastructure
 
         public void Update<TModel>(string collectionName, TModel model, string filter)
         {
-            LoadDatabase();
-
             if (String.IsNullOrEmpty(collectionName) || model == null || String.IsNullOrEmpty(filter))
             {
                 throw new Exception("Invalid input is supplied");
@@ -58,8 +55,6 @@ namespace Infrastructure
 
         public T Read<T>(string collectionName, string filter)
         {
-            LoadDatabase();
-
             if (String.IsNullOrEmpty(collectionName) || String.IsNullOrEmpty(filter))
             {
                 throw new Exception("Invalid input is supplied");
@@ -73,8 +68,6 @@ namespace Infrastructure
 
         public IEnumerable<T> ReadAll<T>(string collectionName)
         {
-            LoadDatabase();
-
             if (String.IsNullOrEmpty(collectionName))
             {
                 throw new Exception("Invalid input is supplied");

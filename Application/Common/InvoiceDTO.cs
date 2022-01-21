@@ -7,12 +7,13 @@ namespace Application.Common
 {
     public class InvoiceDTO
     {
-        public string Id { get; set; }  = default!;
-        public string InvoiceNumber { get; set; }  = default!;
-        public string Date { get; set; }  = default!;
-        public string CompanyId { get; set; }  = default!;
-        public string Vendor { get; set; }  = default!;
+        // public string Id { get; set; }  = default!;
+        // public string Date { get; set; }  = default!;
+        // public string CompanyId { get; set; }  = default!;
+        // public string Vendor { get; set; }  = default!;
 
-        public Status InvoiceStatus { get; private set; }
+        public string InvoiceNumber { get; set; } = default!;
+        public string InvoiceAmount { get; set; } = default!;
+        public Status InvoiceStatus { get; set; }
     }
 }
