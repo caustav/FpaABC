@@ -32,9 +32,9 @@ namespace Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public InvoiceDTO Get(string id)
+        public async Task<InvoiceDTO> Get(string id)
         {
-            return MongoAdapter.Read<InvoiceDTO>(CollectionName, "{" + $"\"InvoiceNumber\":\"{id}\"" + "}");
+            return await MongoAdapter.Read<InvoiceDTO>(CollectionName, "{" + $"\"InvoiceNumber\":\"{id}\"" + "}");
         }
 
         public IEnumerable<InvoiceDTO> GetAll()
@@ -42,11 +42,10 @@ namespace Infrastructure.Repositories
             return MongoAdapter.ReadAll<InvoiceDTO>(CollectionName);
         }
 
-        public InvoiceDTO Set(InvoiceDTO invoiceObj)
+        public async Task Set(InvoiceDTO invoiceObj)
         {
-            MongoAdapter.Update(CollectionName, 
+            await MongoAdapter.Update(CollectionName, 
                 invoiceObj, "{" + $"\"InvoiceNumber\":\"{invoiceObj.InvoiceNumber}\"" + "}");
-            return invoiceObj;
         }
     }
 }

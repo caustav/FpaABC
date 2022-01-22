@@ -31,7 +31,7 @@ namespace Infrastructure.EventStore
             try
             {
                 client = new EventStorePersistentSubscriptionsClient(
-                    EventStoreClientSettings.Create("esdb://localhost:2111,localhost:2112,localhost:2113?tls=true&tlsVerifyCert=false")
+                    EventStoreClientSettings.Create("esdb://127.0.0.1:2111,127.0.0.1:2112,127.0.0.1:2113?tls=true&tlsVerifyCert=false")
                 );
 
                 this.userCredentials = new UserCredentials("admin", "changeit");

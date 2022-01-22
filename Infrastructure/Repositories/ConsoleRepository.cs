@@ -25,9 +25,9 @@ namespace Infrastructure.Repositories
             return new InvoiceDTO { InvoiceNumber = "I#1234",   InvoiceAmount = "1234"};
         }
 
-        public InvoiceDTO Get(string id)
+        public Task<InvoiceDTO> Get(string id)
         {
-            return new InvoiceDTO { InvoiceNumber = "II#1234", InvoiceAmount = "1234"};
+            return Task.FromResult(new InvoiceDTO { InvoiceNumber = "II#1234", InvoiceAmount = "1234"});
         }
 
         public IEnumerable<InvoiceDTO> GetAll()
@@ -39,9 +39,9 @@ namespace Infrastructure.Repositories
             };
         }
 
-        public InvoiceDTO Set(InvoiceDTO invoice)
+        public Task Set(InvoiceDTO invoice)
         {
-            return new InvoiceDTO { InvoiceNumber = "IIS#1234", InvoiceAmount = "1234"};
+            return Task.CompletedTask;
         }
     }
 }

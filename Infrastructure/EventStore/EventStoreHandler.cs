@@ -15,7 +15,7 @@ namespace Infrastructure.EventStore
         {
             this.Logger = logger;
 
-            var settings = EventStoreClientSettings.Create("esdb://localhost:2111,localhost:2112,localhost:2113?tls=true&tlsVerifyCert=false");
+            var settings = EventStoreClientSettings.Create("esdb://127.0.0.1:2111,127.0.0.1:2112,127.0.0.1:2113?tls=true&tlsVerifyCert=false");
             eventStoreClient = new EventStoreClient(settings);
         }
 

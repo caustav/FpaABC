@@ -25,20 +25,24 @@ namespace Application.Projections
             return Task.CompletedTask;
         }
 
-        public Task Handle(InvoiceApproved request, CancellationToken cancellationToken)
+        public async Task Handle(InvoiceApproved request, CancellationToken cancellationToken)
         {
-            var dtoInvoice = request.Adapt<InvoiceDTO>();
-            dtoInvoice.InvoiceStatus = Invoice.Status.INVOICE_APPROVED;
-            repository.Set(dtoInvoice);
-            return Task.CompletedTask;
+            var dtoInvoice = await repository.Get(request.InvoiceNumber);
+            if (dtoInvoice != null)
+            {
+                dtoInvoice.InvoiceStatus = Invoice.Status.INVOICE_APPROVED;
+                await repository.Set(dtoInvoice);
+            }
         }
 
-        public Task Handle(InvoiceCompleted request, CancellationToken cancellationToken)
+        public async Task Handle(InvoiceCompleted request, CancellationToken cancellationToken)
         {
-            var dtoInvoice = request.Adapt<InvoiceDTO>();
-            dtoInvoice.InvoiceStatus = Invoice.Status.INVOICE_COMPLETED;
-            repository.Set(dtoInvoice);
-            return Task.CompletedTask;
+            var dtoInvoice = await repository.Get(request.InvoiceNumber);
+            if (dtoInvoice != null)
+            {
+                dtoInvoice.InvoiceStatus = Invoice.Status.INVOICE_COMPLETED;
+                await repository.Set(dtoInvoice);
+            }
         }
     }
 }

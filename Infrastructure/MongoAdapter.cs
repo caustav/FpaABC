@@ -1,8 +1,10 @@
 ﻿using Application.Common;
 using MongoDB.Driver;
+using MongoDB.Bson;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Mapster;
 
 namespace Infrastructure
 {
@@ -18,15 +20,6 @@ namespace Infrastructure
             MongoDatabase = MongoClient.GetDatabase("FpaABC");
         }
 
-        // private void LoadDatabase()
-        // {
-        //     if (MongoDatabase == null)
-        //     {
-        //         MongoClient = new MongoClient(Configuration.DatabaseConnectionString);
-        //         MongoDatabase = MongoClient.GetDatabase(Configuration.DatabaseName);
-        //     }
-        // }
-
         public void Insert<TModel>(string collectionName, TModel doc)
         {
             if (String.IsNullOrEmpty(collectionName) || doc == null)
@@ -38,14 +31,14 @@ namespace Infrastructure
             collection.InsertOne(doc);
         }
 
-        public void Update<TModel>(string collectionName, TModel model, string filter)
+        public async Task Update<TModel>(string collectionName, TModel model, string filter)
         {
             if (String.IsNullOrEmpty(collectionName) || model == null || String.IsNullOrEmpty(filter))
             {
                 throw new Exception("Invalid input is supplied");
             }
 
-            var result = MongoDatabase.GetCollection<TModel>(collectionName).ReplaceOne(filter, model);
+            var result = await MongoDatabase.GetCollection<TModel>(collectionName).ReplaceOneAsync(filter, model);
 
             if (result.MatchedCount == 0)
             {
@@ -53,16 +46,31 @@ namespace Infrastructure
             }
         }
 
-        public T Read<T>(string collectionName, string filter)
+        public async Task<T> Read<T>(string collectionName, string filter)
         {
-            if (String.IsNullOrEmpty(collectionName) || String.IsNullOrEmpty(filter))
+            T tValue = default;
+            try
             {
-                throw new Exception("Invalid input is supplied");
+                if (String.IsNullOrEmpty(collectionName) || String.IsNullOrEmpty(filter))
+                {
+                    throw new Exception("Invalid input is supplied");
+                }
+
+                var collection = MongoDatabase.GetCollection<BsonDocument>(collectionName);
+
+                var findOptions = new FindOptions<MongoDB.Bson.BsonDocument, T>();
+                findOptions.Projection = "{'_id': 0}";
+
+                if (collection != null)
+                {
+                    var tValues =  await collection.FindAsync<T>(filter, findOptions); 
+                    tValue = await tValues.FirstAsync();
+                }            
             }
-
-            var collection = MongoDatabase.GetCollection<T>(collectionName);
-
-            T tValue = collection.FindSync(filter).FirstOrDefault();
+            catch (System.Exception e)
+            {
+                 System.Console.WriteLine(e.Message);
+            }
             return tValue;
         }
 

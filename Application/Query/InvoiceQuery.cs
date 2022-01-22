@@ -25,9 +25,9 @@ namespace Application.Query
             Repository = repository;
         }
 
-        public Task<InvoiceDTO> Handle(InvoiceQuery request, CancellationToken cancellationToken)
+        public async Task<InvoiceDTO> Handle(InvoiceQuery request, CancellationToken cancellationToken)
         {
-            return Task.FromResult(Repository.Get(request.InvoiceNumber));
+            return await Repository.Get(request.InvoiceNumber);
         }
 
         public Task<IEnumerable<InvoiceDTO>> Handle(AllInvoicesQuery request, CancellationToken cancellationToken)
