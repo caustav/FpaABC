@@ -3,6 +3,8 @@ using Mapster;
 using Domain.DomainEvents;
 using Application.Common;
 using Domain;
+using Microsoft.Extensions.Logging;
+
 
 namespace Application.Projections
 {
@@ -11,15 +13,18 @@ namespace Application.Projections
                                         INotificationHandler<InvoiceCompleted>
     {
         IRepository<InvoiceDTO> repository;
+        private readonly ILogger<FpaProjection> logger;
 
-        public FpaProjection(IRepository<InvoiceDTO> repository)
+        public FpaProjection(IRepository<InvoiceDTO> repository, ILogger<FpaProjection> logger)
         {
             this.repository = repository;
+            this.logger = logger;
         }
 
         public Task Handle(InvoiceCreated request, CancellationToken cancellationToken)
         {
             var dtoInvoice = request.Adapt<InvoiceDTO>();
+            logger.LogInformation($"Invoice is being created {dtoInvoice.ToString()}");
             dtoInvoice.InvoiceStatus = Invoice.Status.INVOICE_PENDING;
             repository.Add(dtoInvoice);
             return Task.CompletedTask;

@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Mapster;
+using Microsoft.Extensions.Logging;
+using System.Security;
 
 namespace Infrastructure
 {
@@ -14,10 +16,24 @@ namespace Infrastructure
         public MongoClient MongoClient { get; private set; } = default!;
         public IMongoDatabase MongoDatabase { get; private set; } = default!;
 
-        public MongoAdapter(IConfiguration configuration)
+        private readonly ILogger<MongoAdapter> logger; 
+
+        private SecureString ToSecureString(string plainString)
+        {        
+            SecureString secureString = new SecureString();
+            foreach (char c in plainString.ToCharArray())
+            {
+                secureString.AppendChar(c);
+            }
+            return secureString;
+        }
+
+        public MongoAdapter(IConfiguration configuration, ILogger<MongoAdapter> logger)
         {
-            MongoClient = new MongoClient("mongodb://127.0.0.1:27017");
+            MongoClient = new MongoClient("mongodb://adminuser:password123@10.99.104.16:27017");            
             MongoDatabase = MongoClient.GetDatabase("FpaABC");
+            
+            this.logger = logger;
         }
 
         public void Insert<TModel>(string collectionName, TModel doc)
@@ -27,8 +43,15 @@ namespace Infrastructure
                 throw new Exception("Invalid input is supplied");
             }
 
-            var collection = MongoDatabase.GetCollection<TModel>(collectionName);
-            collection.InsertOne(doc);
+            try
+            {
+                var collection = MongoDatabase.GetCollection<TModel>(collectionName);
+                collection.InsertOne(doc);
+            }
+            catch (System.Exception e)
+            {
+                logger.LogError(e.Message);
+            }
         }
 
         public async Task Update<TModel>(string collectionName, TModel model, string filter)
@@ -48,7 +71,7 @@ namespace Infrastructure
 
         public async Task<T> Read<T>(string collectionName, string filter)
         {
-            T tValue = default;
+            T? tValue = default;
             try
             {
                 if (String.IsNullOrEmpty(collectionName) || String.IsNullOrEmpty(filter))
@@ -71,7 +94,7 @@ namespace Infrastructure
             {
                  System.Console.WriteLine(e.Message);
             }
-            return tValue;
+            return tValue!;
         }
 
         public IEnumerable<T> ReadAll<T>(string collectionName)

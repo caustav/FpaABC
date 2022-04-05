@@ -16,7 +16,15 @@ namespace esr_core
             services.AddCap(options =>
             {
                 options.UseEntityFramework<EventDbContext>();
-                options.UseRabbitMQ(systemConfiguration.RabbitMqConnectionString);
+                // options.UseRabbitMQ(systemConfiguration.RabbitMqConnectionString);
+
+                options.UseRabbitMQ(rabbit=>
+                {
+                    rabbit.HostName = systemConfiguration.RabbitMqConnectionString;
+                    rabbit.UserName = "user";
+                    rabbit.Password = "mWtTq9BJiC";
+                });
+
                 options.UseDashboard();
                 options.FailedRetryCount = 5;
             });
