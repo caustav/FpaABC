@@ -17,8 +17,8 @@ namespace Infrastructure
             services.AddScoped<IESRObserver, RabbitEventStoreObserver>();
             services.AddRabbitEventStore(new SystemConfiguration
             {
-                SQLServerConnectionString = "Server=10.111.218.223,1433;Initial Catalog=EventStore;User ID=SA;Password=abcd@123456;MultipleActiveResultSets=False;TrustServerCertificate=False;Connection Timeout=30;",
-                RabbitMqConnectionString = "10.98.94.199"
+                SQLServerConnectionString = "Server=mssql-svc.default.svc.cluster.local,1433;Initial Catalog=EventStore;User ID=SA;Password=abcd@123456;MultipleActiveResultSets=False;TrustServerCertificate=False;Connection Timeout=30;",
+                RabbitMqConnectionString = "my-release-rabbitmq.default.svc.cluster.local"
             });
                         
             services.AddScoped<IEventStoreHandler, RabbitEventStoreHandler>();

@@ -30,7 +30,7 @@ namespace Infrastructure
 
         public MongoAdapter(IConfiguration configuration, ILogger<MongoAdapter> logger)
         {
-            MongoClient = new MongoClient("mongodb://adminuser:password123@10.99.104.16:27017");            
+            MongoClient = new MongoClient("mongodb://adminuser:password123@mongo-nodeport-svc.default.svc.cluster.local:27017");            
             MongoDatabase = MongoClient.GetDatabase("FpaABC");
             
             this.logger = logger;
