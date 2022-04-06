@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fpa-abc
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: fpa-abc-app-pod
+      labels:
+        app: fpa-abc-app
+    spec:
+      containers:
+        - name: fpa-abc
+          image: dockercaustav/fpa-abc:17
+          resources:
+            limits:
+              memory: 512Mi
+              cpu: "1"
+            requests:
+              memory: 256Mi
+              cpu: "0.2"
+          ports:
+            - containerPort: 80
+              protocol: TCP
+  selector:
+    matchLabels:
+        app: fpa-abc-app

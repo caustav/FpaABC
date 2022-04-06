@@ -7,7 +7,6 @@ Application/obj
 Domain/bin
 Domain/obj
 publish/
-kubernetes/
 esr-core/bin
 esr-core/obj
 .vscode/
